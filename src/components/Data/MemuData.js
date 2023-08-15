@@ -13,11 +13,11 @@ const MemuData = [
     path: "/Register",
     icon: <HowToRegIcon />,
   },
-  {
-    title: "Edit Profile",
-    path: "/EditProfile ",
-    icon: <AccountBoxIcon />,
-  },
+  // {
+  //   title: "Edit Profile",
+  //   path: "/EditProfile ",
+  //   icon: <AccountBoxIcon />,
+  // },
 ];
 
 export default MemuData;
