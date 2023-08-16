@@ -24,51 +24,51 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 
 const defaultTheme = createTheme();
 
 function Form_User(props) {
-  const [userInfo, setUserInfo] = useLocalStorage(props.json, {});
-  const [file, setFile] = useState();
 
-  const [open, setOpen] = useState(false);
-  const [aletTitle, setAlertTitle] = useState("");
-  const [alertMsg, setAlertMsg] = useState("");
+  const [userInfo, setUserInfo] = useLocalStorage("json", []);
 
   const validationSchema = Yup.object().shape({
-    tb_username: Yup.string()
-      .required("Username is required")
-      .min(4, "Username must be at least 4 characters")
-      .max(12, "Username must not exceed 12 characters")
-      .matches(/^[a-zA-Z0-9_]*$/, "Invalid password"),
+    tb_username: props.mode == "Register"
+      ? Yup.string()
+        .required("Username is required")
+        .min(4, "Username must be at least 4 characters")
+        .max(12, "Username must not exceed 12 characters")
+        .matches(/^[a-zA-Z0-9_]*$/, "Invalid password") : Yup.string(),
 
     tb_fitstname: Yup.string()
       .required("Password is required")
       .max(60, "Password must be at least 6 characters"),
 
     tb_file:
-      props.json == ""
+      props.mode == "Register"
         ? Yup.mixed()
-            .test("required", "photo is required", (value) => value.length > 0)
-            .test("fileType", "Unsupported File Format", (value) => {
-              return (
-                value.length &&
-                ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
-              );
-            })
-            .test("fileSize", "The file is too large", (value) => {
-              if (!value.length) return true; // attachment is optional
-              return value[0].size <= 1024 * 1024 * 5;
-            })
-        : null,
+          .test("required", "photo is required", (value) => value.length > 0)
+          .test("fileType", "Unsupported File Format", (value) => {
+            return (
+              value.length &&
+              ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
+            );
+          })
+          .test("fileSize", "The file is too large", (value) => {
+            if (!value.length) return true; // attachment is optional
+            return value[0].size <= 1024 * 1024 * 5;
+          })
+        : Yup.mixed(),
 
     tb_password:
-      props.json == ""
+      props.mode == "Register"
         ? Yup.string()
-            .required("Password is required")
-            .min(6, "Password must be at least 6 characters")
-        : null,
+          .required("Password is required")
+          .min(6, "Password must be at least 6 characters")
+        : Yup.string(),
   });
+
   const {
     register,
     control,
@@ -76,79 +76,76 @@ function Form_User(props) {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      tb_username: userInfo.Username,
-      tb_fitstname: userInfo.FirstName,
-      tb_lastname: userInfo.LastName,
-      tb_file: userInfo.Path_file,
+      tb_username: props.mode == "Update" ? userInfo[0].UserName : "",
+      tb_fitstname: props.mode == "Update" ? userInfo[0].FirstName : "",
+      tb_lastname: props.mode == "Update" ? userInfo[0].LastName : ""
     },
     resolver: yupResolver(validationSchema),
   });
 
-  const onSubmit = async (data) => {
-    // console.log(data)
+  const onSubmit = (data) => {
 
-    let user = data.tb_username;
+
+    let user = userInfo.length == 0 ? data.tb_username : userInfo[0].UserName;
     let pass = data.tb_password;
     let firstName = data.tb_fitstname;
     let lastname = data.tb_lastname;
     let file = data.tb_file;
 
-    console.log(file);
+    // console.log(file)
 
-    setFile(file);
 
     const k_data = {
       user: user,
       pass: pass,
       f_name: firstName,
       l_name: lastname,
-      path_file: file[0].name,
+      path_file: file.length == 0 ? undefined : file[0].name,
     };
 
-    if (Object.keys(userInfo).length === 0) {
+    if (props.mode == "Register") {
+
+      console.log("Reg")
+      console.log(k_data)
       axios
         .post("http://localhost:6180/reg_user", k_data, {
           headers: {
             "Content-Type": "application/json",
           },
         })
-        .then((res) => res.data[0])
-        .then((json) => {
-          console.log(json);
+        .then((res) => {
+          console.log(res.data)
+
+          if (res.data.result == "ok") {
+            // setUserInfo(localStorage.getItem("json"));
+
+          }
         })
+
         .catch((err) => {
           console.log(err);
         });
     } else {
-      let check =
-        data.tb_password &&
-        (await axios
-          .post("http://localhost:6180/check_pass", k_data, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-          .then((res) => res.data)
-          .then((json) => {
-            console.log(json);
-            if (json.length >= 1) {
-              return true;
-            } else {
-              return false;
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          }));
+      console.log("Update")
+      console.log(k_data)
 
-      console.log(check);
+      axios
+        .post("http://localhost:6180/update_user", k_data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then((res) => {
+          console.log(res.data)
+          return res.data;
+        })
 
-      if (check) {
-        setOpen(true);
-        setAlertTitle("Password : Warning");
-        setAlertMsg("Password is duplicate from 5 time ago");
-      }
+        .catch((err) => {
+          console.log(err);
+          return err
+        });
     }
+
   };
 
   const [selectedImage, setSelectedImage] = useState("");
@@ -164,195 +161,185 @@ function Form_User(props) {
     // }
   };
 
-  const Transition = React.forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  });
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   useEffect(() => {
-    console.log(userInfo);
+    console.log("useEffect")
 
-    Object.keys(userInfo).length !== 0
-      ? setSelectedImage(require("../../image/" + userInfo.Path_file))
+
+    console.log(userInfo.length);
+    console.log(userInfo[0])
+    console.log(props.mode)
+
+    if (props.mode == "Register") {
+      localStorage.clear();
+    }
+
+
+    props.mode == "Update"
+      ? setSelectedImage(require("../../image/" + userInfo[0].Path_file))
       : setSelectedImage("");
   }, []);
 
+
   return (
-    <div>
-      <div>
-        <Dialog
-          open={open}
-          TransitionComponent={Transition}
-          keepMounted
-          onClose={handleClose}
-          aria-describedby="alert-dialog-slide-description"
-        >
-          <DialogTitle>{aletTitle}</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-slide-description">
-              {alertMsg}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>OK</Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-      <div>
-        {" "}
-        <Container maxWidth={false}>
-          <Stack direction="row" spacing={2}>
-            <Grid item sm={12}>
-              <Box
-                sx={{
-                  marginTop: 8,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex",
-                }}
-              >
-                <Typography variant="h4">
+    <Container maxWidth={false}>
+      <CssBaseline />
+
+
+      <Grid container spacing={2} style={{ display: "flex", justifyContent: "center" }}>
+        <Card sx={{ m: 12 }}>
+
+          <Box
+            component="form"
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            sx={{ mt: 1 }}
+          >
+
+            <CardContent>
+              <Grid style={{ textAlign: "center" }}>
+
+                <Typography component="h4" variant="h5">
                   <b>
-                    {Object.keys(userInfo).length === 0
+                    {props.mode == "Register"
                       ? "REGISTER"
                       : "EDIT PROFILE"}
                   </b>
                 </Typography>
-                <Box
-                  component="form"
-                  onSubmit={handleSubmit(onSubmit)}
-                  noValidate
-                  sx={{ mt: 1 }}
-                >
-                  <Grid item xs={12} sm={6}>
-                    {Object.keys(userInfo).length === 0 ? (
-                      <div>
-                        <TextField
-                          required
-                          id="tb_username"
-                          label="User Name"
-                          type="text"
-                          fullWidth
-                          margin="dense"
-                          {...register("tb_username")}
-                          error={errors.tb_username ? true : false}
-                          inputProps={{
-                            readOnly:
-                              Object.keys(userInfo).length === 0 ? false : true,
-                            maxLength: 12,
-                          }}
-                        />
-                        <Typography variant="inherit" color="textSecondary">
-                          {errors.tb_username?.message}
-                        </Typography>
-                      </div>
-                    ) : (
-                      <div>
-                        <h2>{userInfo.Username}</h2>
-                      </div>
-                    )}
-                  </Grid>
 
-                  <Grid item xs={12} sm={6}>
+
+              </Grid>
+
+              <Grid style={{ textAlign: "left" }}>
+                {props.mode == "Register" ? (
+                  <div>
                     <TextField
                       required
-                      id="tb_password"
-                      label="Password"
-                      type="password"
-                      fullWidth
-                      margin="dense"
-                      {...register("tb_password")}
-                      error={errors.tb_password ? true : false}
-                    />
-                    <Typography variant="inherit" color="textSecondary">
-                      {errors.tb_password?.message}
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      required
-                      id="tb_fitstname"
-                      label="First Name"
+                      id="tb_username"
+                      label="User Name"
                       type="text"
                       fullWidth
                       margin="dense"
-                      {...register("tb_fitstname")}
-                      error={errors.tb_fitstname ? true : false}
+                      {...register("tb_username")}
+                      error={errors.tb_username ? true : false}
                       inputProps={{
-                        maxLength: 60,
+
+                        maxLength: 12,
                       }}
                     />
                     <Typography variant="inherit" color="textSecondary">
-                      {errors.tb_fitstname?.message}
+                      {errors.tb_username?.message}
                     </Typography>
-                  </Grid>
+                  </div>
+                ) : (
+                  <div>
+                    <h2>{userInfo.UserName}</h2>
+                  </div>
+                )}
+              </Grid>
 
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      required
-                      id="tb_lastname"
-                      label="Last Name"
-                      type="text"
-                      fullWidth
-                      margin="dense"
-                      {...register("tb_lastname")}
-                      error={errors.tb_lastname ? true : false}
-                      inputProps={{
-                        maxLength: 60,
-                      }}
-                    />
-                    <Typography variant="inherit" color="textSecondary">
-                      {errors.tb_lastname?.message}
-                    </Typography>
-                  </Grid>
+              <Grid style={{ textAlign: "left" }}>
+                <TextField
+                  required
+                  id="tb_password"
+                  label="Password"
+                  type="password"
+                  fullWidth
+                  margin="dense"
+                  {...register("tb_password")}
+                  error={errors.tb_password ? true : false}
+                />
+                <Typography variant="inherit" color="textSecondary">
+                  {errors.tb_password?.message}
+                </Typography>
+              </Grid>
 
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      required
-                      id="tb_file"
-                      type="file"
-                      fullWidth
-                      inputProps={{ accept: "image/jpeg, image/png" }}
-                      onChange={previewImage}
-                      margin="dense"
-                      {...register("tb_file")}
-                      error={errors.tb_file ? true : false}
-                    />
+              <Grid style={{ textAlign: "left" }}>
+                <TextField
+                  required
+                  id="tb_fitstname"
+                  label="First Name"
+                  type="text"
+                  fullWidth
+                  margin="dense"
+                  {...register("tb_fitstname")}
+                  error={errors.tb_fitstname ? true : false}
+                  inputProps={{
+                    maxLength: 60,
+                  }}
+                />
+                <Typography variant="inherit" color="textSecondary">
+                  {errors.tb_fitstname?.message}
+                </Typography>
+              </Grid>
 
-                    <img
-                      src={selectedImage}
-                      alt="Preview"
-                      loading="lazy"
-                      height="200"
-                    />
+              <Grid style={{ textAlign: "left" }}>
+                <TextField
+                  required
+                  id="tb_lastname"
+                  label="Last Name"
+                  type="text"
+                  fullWidth
+                  margin="dense"
+                  {...register("tb_lastname")}
+                  error={errors.tb_lastname ? true : false}
+                  inputProps={{
+                    maxLength: 60,
+                  }}
+                />
+                <Typography variant="inherit" color="textSecondary">
+                  {errors.tb_lastname?.message}
+                </Typography>
+              </Grid>
 
-                    <Typography variant="inherit" color="textSecondary">
-                      {errors.tb_file?.message}
-                    </Typography>
-                  </Grid>
+              <Grid style={{ textAlign: "center" }}>
+                <TextField
+                  required
+                  id="tb_file"
+                  type="file"
+                  fullWidth
+                  inputProps={{ accept: "image/jpeg, image/png" }}
+                  onChange={previewImage}
+                  margin="dense"
+                  {...register("tb_file")}
+                  error={errors.tb_file ? true : false}
+                />
 
-                  <Grid item xs={12} sm={6}>
-                    <Box display="flex" justifyContent="flex-end">
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
-                      >
-                        {Object.keys(userInfo).length === 0
-                          ? "Register"
-                          : "Update"}
-                      </Button>
-                    </Box>
-                  </Grid>
+                <img
+                  src={selectedImage}
+                  alt="Preview"
+                  loading="lazy"
+                  height="200"
+                />
+
+                <Typography variant="inherit" color="textSecondary">
+                  {errors.tb_file?.message}
+                </Typography>
+              </Grid>
+
+              <Grid style={{ textAlign: "left" }}>
+                <Box display="flex" justifyContent="flex-end">
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
+                    {props.mode == "Register"
+                      ? "Register"
+                      : "Update"}
+                  </Button>
                 </Box>
-              </Box>
-            </Grid>
+              </Grid>
+            </CardContent>
 
-            <Grid item sm={12}>
+
+          </Box>
+
+
+
+        </Card>
+      </Grid>
+
+      {/* <Grid item sm={12}>
               <Box display="flex" justifyContent="flex-end">
                 {Object.keys(userInfo).length !== 0 && (
                   <Button
@@ -368,11 +355,8 @@ function Form_User(props) {
                   </Button>
                 )}
               </Box>
-            </Grid>
-          </Stack>
-        </Container>
-      </div>
-    </div>
+            </Grid> */}
+    </Container>
   );
 }
 

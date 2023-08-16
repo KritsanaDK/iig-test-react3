@@ -20,10 +20,13 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Link } from "@mui/material";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+
 import MemuData from "./components/Data/MemuData";
 import Home from "./components/Page/Home";
-import Login from "./components/Page/Login";
 import Form_User from "./components/Page/Form_User";
+import LoginPage from "./components/Page/LoginPage";
 
 const drawerWidth = 240;
 
@@ -85,9 +88,9 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <Box sx={{ display: "flex" }}>
-        <CssBaseline />
+    <BrowserRouter >
+      <Box sx={{ display: "flex" }} >
+        {/* <CssBaseline /> */}
         <AppBar position="fixed" open={open}>
           <Toolbar>
             <IconButton
@@ -100,7 +103,7 @@ function App() {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" noWrap component="div">
-              IIG Test
+              MUI
             </Typography>
           </Toolbar>
         </AppBar>
@@ -116,6 +119,7 @@ function App() {
           variant="persistent"
           anchor="left"
           open={open}
+
         >
           <DrawerHeader>
             <IconButton onClick={handleDrawerClose}>
@@ -148,17 +152,18 @@ function App() {
             ))}
           </List>
         </Drawer>
-        <Main open={open}>
+        <Main open={open}  >
           <DrawerHeader />
           <Routes>
             <Route path="*" Component={Home} />
-            <Route path="/Login" Component={Login} />
-            <Route path="/Register" element={<Form_User json="" />} />
-            <Route path="/Update" element={<Form_User json="json" />} />
+            <Route path="/Login" Component={LoginPage} />
+            <Route path="/Register" element={<Form_User mode="Register" />} />
+            <Route path="/Update" element={<Form_User mode="Update" />} />
           </Routes>
         </Main>
       </Box>
     </BrowserRouter>
+
   );
 }
 
