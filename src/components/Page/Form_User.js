@@ -24,22 +24,33 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 
 const defaultTheme = createTheme();
 
 function Form_User(props) {
-
   const [userInfo, setUserInfo] = useLocalStorage("json", []);
 
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const validationSchema = Yup.object().shape({
-    tb_username: props.mode == "Register"
-      ? Yup.string()
-        .required("Username is required")
-        .min(4, "Username must be at least 4 characters")
-        .max(12, "Username must not exceed 12 characters")
-        .matches(/^[a-zA-Z0-9_]*$/, "Invalid password") : Yup.string(),
+    tb_username:
+      props.mode == "Register"
+        ? Yup.string()
+            .required("Username is required")
+            .min(4, "Username must be at least 4 characters")
+            .max(12, "Username must not exceed 12 characters")
+            .matches(/^[a-zA-Z0-9_]*$/, "Invalid password")
+        : Yup.string(),
 
     tb_fitstname: Yup.string()
       .required("Password is required")
@@ -48,24 +59,33 @@ function Form_User(props) {
     tb_file:
       props.mode == "Register"
         ? Yup.mixed()
-          .test("required", "photo is required", (value) => value.length > 0)
-          .test("fileType", "Unsupported File Format", (value) => {
-            return (
-              value.length &&
-              ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
-            );
-          })
-          .test("fileSize", "The file is too large", (value) => {
-            if (!value.length) return true; // attachment is optional
-            return value[0].size <= 1024 * 1024 * 5;
-          })
+            .test("required", "photo is required", (value) => value.length > 0)
+            .test("fileType", "Unsupported File Format", (value) => {
+              return (
+                value.length &&
+                ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
+              );
+            })
+            .test("fileSize", "The file is too large", (value) => {
+              if (!value.length) return true; // attachment is optional
+              return value[0].size <= 1024 * 1024 * 5;
+            })
         : Yup.mixed(),
 
     tb_password:
       props.mode == "Register"
         ? Yup.string()
-          .required("Password is required")
-          .min(6, "Password must be at least 6 characters")
+            .required("Password is required")
+            .min(6, "Password must be at least 6 characters")
+            .test("Find 0-9", "The number is not order 0-9", (val) => {
+              return !"0123456789".includes(val);
+            })
+            .test("Find a-z", "The alphabet is not order a-z", (val) => {
+              return !"abcdefghijklmnopqrstuvwxyz".includes(val);
+            })
+            .test("Find A-Z", "The alphabet is not order A-Z", (val) => {
+              return !"ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(val);
+            })
         : Yup.string(),
   });
 
@@ -78,14 +98,12 @@ function Form_User(props) {
     defaultValues: {
       tb_username: props.mode == "Update" ? userInfo[0].UserName : "",
       tb_fitstname: props.mode == "Update" ? userInfo[0].FirstName : "",
-      tb_lastname: props.mode == "Update" ? userInfo[0].LastName : ""
+      tb_lastname: props.mode == "Update" ? userInfo[0].LastName : "",
     },
     resolver: yupResolver(validationSchema),
   });
 
   const onSubmit = (data) => {
-
-
     let user = userInfo.length == 0 ? data.tb_username : userInfo[0].UserName;
     let pass = data.tb_password;
     let firstName = data.tb_fitstname;
@@ -94,19 +112,17 @@ function Form_User(props) {
 
     // console.log(file)
 
-
     const k_data = {
       user: user,
       pass: pass,
       f_name: firstName,
       l_name: lastname,
-      path_file: file.length == 0 ? undefined : file[0].name,
+      file_name: file.length == 0 ? undefined : file[0].name,
     };
 
     if (props.mode == "Register") {
-
-      console.log("Reg")
-      console.log(k_data)
+      console.log("Reg");
+      console.log(k_data);
       axios
         .post("http://localhost:6180/reg_user", k_data, {
           headers: {
@@ -114,11 +130,11 @@ function Form_User(props) {
           },
         })
         .then((res) => {
-          console.log(res.data)
+          console.log(res.data);
 
           if (res.data.result == "ok") {
             // setUserInfo(localStorage.getItem("json"));
-
+            setOpen(true);
           }
         })
 
@@ -126,8 +142,8 @@ function Form_User(props) {
           console.log(err);
         });
     } else {
-      console.log("Update")
-      console.log(k_data)
+      console.log("Update");
+      console.log(k_data);
 
       axios
         .post("http://localhost:6180/update_user", k_data, {
@@ -136,16 +152,21 @@ function Form_User(props) {
           },
         })
         .then((res) => {
-          console.log(res.data)
-          return res.data;
+          console.log(res.data);
+
+          if (res.data.result == "ok") {
+            // setUserInfo(localStorage.getItem("json"));
+            setOpen(true);
+          }
+
+          // return res.data;
         })
 
         .catch((err) => {
           console.log(err);
-          return err
+          return err;
         });
     }
-
   };
 
   const [selectedImage, setSelectedImage] = useState("");
@@ -162,51 +183,65 @@ function Form_User(props) {
   };
 
   useEffect(() => {
-    console.log("useEffect")
-
+    console.log("useEffect");
 
     console.log(userInfo.length);
-    console.log(userInfo[0])
-    console.log(props.mode)
+    console.log(userInfo[0]);
+    console.log(props.mode);
 
     if (props.mode == "Register") {
       localStorage.clear();
     }
 
-
     props.mode == "Update"
-      ? setSelectedImage(require("../../image/" + userInfo[0].Path_file))
+      ? setSelectedImage(require("../../image/" + userInfo[0].file_name))
       : setSelectedImage("");
   }, []);
 
-
   return (
     <Container maxWidth={false}>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {props.mode == "Register" ? "Register" : "Update"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {props.mode == "Register"
+              ? "Register is completed"
+              : "Update  is completed"}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>OK</Button>
+        </DialogActions>
+      </Dialog>
+
       <CssBaseline />
 
-
-      <Grid container spacing={2} style={{ display: "flex", justifyContent: "center" }}>
+      <Grid
+        container
+        spacing={2}
+        style={{ display: "flex", justifyContent: "center" }}
+      >
         <Card sx={{ m: 12 }}>
-
           <Box
             component="form"
             onSubmit={handleSubmit(onSubmit)}
             noValidate
             sx={{ mt: 1 }}
           >
-
             <CardContent>
               <Grid style={{ textAlign: "center" }}>
-
                 <Typography component="h4" variant="h5">
                   <b>
-                    {props.mode == "Register"
-                      ? "REGISTER"
-                      : "EDIT PROFILE"}
+                    {props.mode == "Register" ? "REGISTER" : "EDIT PROFILE"}
                   </b>
                 </Typography>
-
-
               </Grid>
 
               <Grid style={{ textAlign: "left" }}>
@@ -222,7 +257,6 @@ function Form_User(props) {
                       {...register("tb_username")}
                       error={errors.tb_username ? true : false}
                       inputProps={{
-
                         maxLength: 12,
                       }}
                     />
@@ -297,7 +331,9 @@ function Form_User(props) {
                   id="tb_file"
                   type="file"
                   fullWidth
-                  inputProps={{ accept: "image/jpeg, image/png" }}
+                  inputProps={{
+                    accept: "image/jpeg, image/jpg, image/png, image/bmp",
+                  }}
                   onChange={previewImage}
                   margin="dense"
                   {...register("tb_file")}
@@ -323,19 +359,12 @@ function Form_User(props) {
                     variant="contained"
                     sx={{ mt: 3, mb: 2 }}
                   >
-                    {props.mode == "Register"
-                      ? "Register"
-                      : "Update"}
+                    {props.mode == "Register" ? "Register" : "Update"}
                   </Button>
                 </Box>
               </Grid>
             </CardContent>
-
-
           </Box>
-
-
-
         </Card>
       </Grid>
 
