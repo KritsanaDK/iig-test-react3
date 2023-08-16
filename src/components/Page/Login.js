@@ -23,7 +23,7 @@ import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import Stack from "@mui/material/Stack";
 const defaultTheme = createTheme();
 
-function Login() {
+function LoginPage() {
   const validationSchema = Yup.object().shape({
     tb_username: Yup.string()
       .required("Username is required")
