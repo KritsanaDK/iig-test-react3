@@ -20,8 +20,7 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Link } from "@mui/material";
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import MemuData from "./components/Data/MemuData";
 import Home from "./components/Page/Home";
@@ -88,82 +87,14 @@ function App() {
   };
 
   return (
-    <BrowserRouter >
-      <Box sx={{ display: "flex" }} >
-        {/* <CssBaseline /> */}
-        <AppBar position="fixed" open={open}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{ mr: 2, ...(open && { display: "none" }) }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" noWrap component="div">
-              MUI
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            "& .MuiDrawer-paper": {
-              width: drawerWidth,
-              boxSizing: "border-box",
-            },
-          }}
-          variant="persistent"
-          anchor="left"
-          open={open}
-
-        >
-          <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
-              {theme.direction === "ltr" ? (
-                <ChevronLeftIcon />
-              ) : (
-                <ChevronRightIcon />
-              )}
-            </IconButton>
-          </DrawerHeader>
-          <Divider />
-          <List>
-            {MemuData.map((menu, index) => (
-              <ListItem key={index} disablePadding>
-                <Link
-                  href={menu.path}
-                  style={{
-                    paddingLeft: 13,
-                    textDecoration: "none",
-                    color: "#424242",
-                    width: "100%",
-                  }}
-                >
-                  <ListItemButton>
-                    <ListItemIcon>{menu.icon}</ListItemIcon>
-                    <ListItemText primary={menu.title} />
-                  </ListItemButton>
-                </Link>
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
-        <Main open={open}  >
-          <DrawerHeader />
-          <Routes>
-            <Route path="*" Component={Home} />
-            <Route path="/Login" Component={LoginPage} />
-            <Route path="/Register" element={<Form_User mode="Register" />} />
-            <Route path="/Update" element={<Form_User mode="Update" />} />
-          </Routes>
-        </Main>
-      </Box>
+    <BrowserRouter>
+      <Routes>
+        <Route path="*" Component={LoginPage} />
+        <Route path="/Login" Component={LoginPage} />
+        <Route path="/Register" element={<Form_User mode="Register" />} />
+        <Route path="/Update" element={<Form_User mode="Update" />} />
+      </Routes>
     </BrowserRouter>
-
   );
 }
 
