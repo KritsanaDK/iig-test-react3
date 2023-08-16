@@ -100,8 +100,8 @@ function LoginPage() {
             >
               <CardContent>
                 <Grid style={{ textAlign: "center" }}>
-                  <Typography component="h1" variant="h5">
-                    Log In
+                  <Typography component="h4" variant="h5">
+                    <b>LOGIN</b>
                   </Typography>
                 </Grid>
 
