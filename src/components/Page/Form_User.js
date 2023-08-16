@@ -199,7 +199,15 @@ function Form_User(props) {
   }, []);
 
   return (
-    <Container maxWidth={false}>
+    <Container
+      component="main"
+      maxWidth={false}
+      style={{
+        background: "#e0f2f1",
+        height: "100vh",
+        margin: "0px",
+      }}
+    >
       <Dialog
         open={open}
         onClose={handleClose}
@@ -225,147 +233,157 @@ function Form_User(props) {
 
       <Grid
         container
+        direction="row"
+        justifyContent="center"
         spacing={2}
-        style={{ display: "flex", justifyContent: "center" }}
+        style={{
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
-        <Card sx={{ m: 12 }}>
-          <Box
-            component="form"
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-            sx={{ mt: 1 }}
-          >
-            <CardContent>
-              <Grid style={{ textAlign: "center" }}>
-                <Typography component="h4" variant="h5">
-                  <b>
-                    {props.mode == "Register" ? "REGISTER" : "EDIT PROFILE"}
-                  </b>
-                </Typography>
-              </Grid>
+        <Grid xs={4}>
+          <Card>
+            <Box
+              component="form"
+              onSubmit={handleSubmit(onSubmit)}
+              noValidate
+              sx={{ mt: 1 }}
+            >
+              <CardContent>
+                <Grid style={{ textAlign: "center" }}>
+                  <Typography component="h4" variant="h5">
+                    <b>
+                      {props.mode == "Register" ? "REGISTER" : "EDIT PROFILE"}
+                    </b>
+                  </Typography>
+                </Grid>
 
-              <Grid style={{ textAlign: "left" }}>
-                {props.mode == "Register" ? (
-                  <div>
-                    <TextField
-                      required
-                      id="tb_username"
-                      label="User Name"
-                      type="text"
-                      fullWidth
-                      margin="dense"
-                      {...register("tb_username")}
-                      error={errors.tb_username ? true : false}
-                      inputProps={{
-                        maxLength: 12,
-                      }}
-                    />
-                    <Typography variant="inherit" color="textSecondary">
-                      {errors.tb_username?.message}
-                    </Typography>
-                  </div>
-                ) : (
-                  <div>
-                    <h2>{userInfo.UserName}</h2>
-                  </div>
-                )}
-              </Grid>
+                <Grid style={{ textAlign: "left" }}>
+                  {props.mode == "Register" ? (
+                    <div>
+                      <TextField
+                        required
+                        id="tb_username"
+                        label="User Name"
+                        type="text"
+                        fullWidth
+                        margin="dense"
+                        {...register("tb_username")}
+                        error={errors.tb_username ? true : false}
+                        inputProps={{
+                          maxLength: 12,
+                        }}
+                      />
+                      <Typography variant="inherit" color="textSecondary">
+                        {errors.tb_username?.message}
+                      </Typography>
+                    </div>
+                  ) : (
+                    <div>
+                      <h2>{userInfo.UserName}</h2>
+                    </div>
+                  )}
+                </Grid>
 
-              <Grid style={{ textAlign: "left" }}>
-                <TextField
-                  required
-                  id="tb_password"
-                  label="Password"
-                  type="password"
-                  fullWidth
-                  margin="dense"
-                  {...register("tb_password")}
-                  error={errors.tb_password ? true : false}
-                />
-                <Typography variant="inherit" color="textSecondary">
-                  {errors.tb_password?.message}
-                </Typography>
-              </Grid>
+                <Grid style={{ textAlign: "left" }}>
+                  <TextField
+                    required
+                    id="tb_password"
+                    label="Password"
+                    type="password"
+                    fullWidth
+                    margin="dense"
+                    {...register("tb_password")}
+                    error={errors.tb_password ? true : false}
+                  />
+                  <Typography variant="inherit" color="textSecondary">
+                    {errors.tb_password?.message}
+                  </Typography>
+                </Grid>
 
-              <Grid style={{ textAlign: "left" }}>
-                <TextField
-                  required
-                  id="tb_fitstname"
-                  label="First Name"
-                  type="text"
-                  fullWidth
-                  margin="dense"
-                  {...register("tb_fitstname")}
-                  error={errors.tb_fitstname ? true : false}
-                  inputProps={{
-                    maxLength: 60,
-                  }}
-                />
-                <Typography variant="inherit" color="textSecondary">
-                  {errors.tb_fitstname?.message}
-                </Typography>
-              </Grid>
+                <Grid style={{ textAlign: "left" }}>
+                  <TextField
+                    required
+                    id="tb_fitstname"
+                    label="First Name"
+                    type="text"
+                    fullWidth
+                    margin="dense"
+                    {...register("tb_fitstname")}
+                    error={errors.tb_fitstname ? true : false}
+                    inputProps={{
+                      maxLength: 60,
+                    }}
+                  />
+                  <Typography variant="inherit" color="textSecondary">
+                    {errors.tb_fitstname?.message}
+                  </Typography>
+                </Grid>
 
-              <Grid style={{ textAlign: "left" }}>
-                <TextField
-                  required
-                  id="tb_lastname"
-                  label="Last Name"
-                  type="text"
-                  fullWidth
-                  margin="dense"
-                  {...register("tb_lastname")}
-                  error={errors.tb_lastname ? true : false}
-                  inputProps={{
-                    maxLength: 60,
-                  }}
-                />
-                <Typography variant="inherit" color="textSecondary">
-                  {errors.tb_lastname?.message}
-                </Typography>
-              </Grid>
+                <Grid style={{ textAlign: "left" }}>
+                  <TextField
+                    required
+                    id="tb_lastname"
+                    label="Last Name"
+                    type="text"
+                    fullWidth
+                    margin="dense"
+                    {...register("tb_lastname")}
+                    error={errors.tb_lastname ? true : false}
+                    inputProps={{
+                      maxLength: 60,
+                    }}
+                  />
+                  <Typography variant="inherit" color="textSecondary">
+                    {errors.tb_lastname?.message}
+                  </Typography>
+                </Grid>
 
-              <Grid style={{ textAlign: "center" }}>
-                <TextField
-                  required
-                  id="tb_file"
-                  type="file"
-                  fullWidth
-                  inputProps={{
-                    accept: "image/jpeg, image/jpg, image/png, image/bmp",
-                  }}
-                  onChange={previewImage}
-                  margin="dense"
-                  {...register("tb_file")}
-                  error={errors.tb_file ? true : false}
-                />
+                <Grid style={{ textAlign: "center" }}>
+                  <TextField
+                    required
+                    id="tb_file"
+                    type="file"
+                    fullWidth
+                    inputProps={{
+                      accept: "image/jpeg, image/jpg, image/png, image/bmp",
+                    }}
+                    onChange={previewImage}
+                    margin="dense"
+                    {...register("tb_file")}
+                    error={errors.tb_file ? true : false}
+                  />
 
-                <img
-                  src={selectedImage}
-                  alt="Preview"
-                  loading="lazy"
-                  height="200"
-                />
+                  <img
+                    src={selectedImage}
+                    alt="Preview"
+                    loading="lazy"
+                    height="200"
+                  />
 
-                <Typography variant="inherit" color="textSecondary">
-                  {errors.tb_file?.message}
-                </Typography>
-              </Grid>
+                  <Typography variant="inherit" color="textSecondary">
+                    {errors.tb_file?.message}
+                  </Typography>
+                </Grid>
 
-              <Grid style={{ textAlign: "left" }}>
-                <Box display="flex" justifyContent="flex-end">
+                <Grid style={{ textAlign: "center" }}>
                   <Button
                     type="submit"
                     variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
+                    color="info"
+                    sx={{ borderRadius: 28 }}
+                    style={{ width: "150px" }}
                   >
                     {props.mode == "Register" ? "Register" : "Update"}
                   </Button>
-                </Box>
-              </Grid>
-            </CardContent>
-          </Box>
-        </Card>
+                </Grid>
+              </CardContent>
+            </Box>
+          </Card>
+        </Grid>
       </Grid>
 
       {/* <Grid item sm={12}>
