@@ -28,7 +28,6 @@ function LoginPage() {
 
   const {
     register,
-    control,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -52,7 +51,7 @@ function LoginPage() {
       .then((json) => {
         console.log(json);
 
-        if (json.length == 1) {
+        if (json.length === 1) {
           setLogIn(false);
           let json_data = JSON.stringify(json, null, 2);
           console.log(json_data);

@@ -1,36 +1,26 @@
 import React, { useState, useEffect } from "react";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useLocalStorage } from "../Data/useLocalStorage";
-import Stack from "@mui/material/Stack";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 
-const defaultTheme = createTheme();
-
 function Form_User(props) {
-  const [userInfo, setUserInfo] = useLocalStorage("json", []);
+  const [userInfo] = useLocalStorage("json", []);
 
   const [open, setOpen] = React.useState(false);
 
@@ -44,7 +34,7 @@ function Form_User(props) {
 
   const validationSchema = Yup.object().shape({
     tb_username:
-      props.mode == "Register"
+      props.mode === "Register"
         ? Yup.string()
             .required("Username is required")
             .min(4, "Username must be at least 4 characters")
@@ -57,7 +47,7 @@ function Form_User(props) {
       .max(60, "Password must be at least 6 characters"),
 
     tb_file:
-      props.mode == "Register"
+      props.mode === "Register"
         ? Yup.mixed()
             .test("required", "photo is required", (value) => value.length > 0)
             .test("fileType", "Unsupported File Format", (value) => {
@@ -73,7 +63,7 @@ function Form_User(props) {
         : Yup.mixed(),
 
     tb_password:
-      props.mode == "Register"
+      props.mode === "Register"
         ? Yup.string()
             .required("Password is required")
             .min(6, "Password must be at least 6 characters")
@@ -91,20 +81,20 @@ function Form_User(props) {
 
   const {
     register,
-    control,
+
     handleSubmit,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      tb_username: props.mode == "Update" ? userInfo[0].UserName : "",
-      tb_fitstname: props.mode == "Update" ? userInfo[0].FirstName : "",
-      tb_lastname: props.mode == "Update" ? userInfo[0].LastName : "",
+      tb_username: props.mode === "Update" ? userInfo[0].UserName : "",
+      tb_fitstname: props.mode === "Update" ? userInfo[0].FirstName : "",
+      tb_lastname: props.mode === "Update" ? userInfo[0].LastName : "",
     },
     resolver: yupResolver(validationSchema),
   });
 
   const onSubmit = (data) => {
-    let user = userInfo.length == 0 ? data.tb_username : userInfo[0].UserName;
+    let user = userInfo.length === 0 ? data.tb_username : userInfo[0].UserName;
     let pass = data.tb_password;
     let firstName = data.tb_fitstname;
     let lastname = data.tb_lastname;
@@ -117,10 +107,10 @@ function Form_User(props) {
       pass: pass,
       f_name: firstName,
       l_name: lastname,
-      file_name: file.length == 0 ? undefined : file[0].name,
+      file_name: file.length === 0 ? undefined : file[0].name,
     };
 
-    if (props.mode == "Register") {
+    if (props.mode === "Register") {
       console.log("Reg");
       console.log(k_data);
       axios
@@ -132,9 +122,9 @@ function Form_User(props) {
         .then((res) => {
           console.log(res.data);
 
-          if (res.data.result == "ok") {
+          if (res.data.result === "ok") {
             // setUserInfo(localStorage.getItem("json"));
-            setOpen(true);
+            handleClickOpen();
           }
         })
 
@@ -154,9 +144,9 @@ function Form_User(props) {
         .then((res) => {
           console.log(res.data);
 
-          if (res.data.result == "ok") {
+          if (res.data.result === "ok") {
             // setUserInfo(localStorage.getItem("json"));
-            setOpen(true);
+            handleClickOpen();
           }
 
           // return res.data;
@@ -189,11 +179,11 @@ function Form_User(props) {
     console.log(userInfo[0]);
     console.log(props.mode);
 
-    if (props.mode == "Register") {
+    if (props.mode === "Register") {
       localStorage.clear();
     }
 
-    props.mode == "Update"
+    props.mode === "Update"
       ? setSelectedImage(require("../../image/" + userInfo[0].file_name))
       : setSelectedImage("");
   }, []);
@@ -256,7 +246,7 @@ function Form_User(props) {
                 <Grid style={{ textAlign: "center" }}>
                   <Typography component="h4" variant="h5">
                     <b>
-                      {props.mode == "Register" ? "REGISTER" : "EDIT PROFILE"}
+                      {props.mode === "Register" ? "REGISTER" : "EDIT PROFILE"}
                     </b>
                   </Typography>
                 </Grid>
@@ -377,7 +367,7 @@ function Form_User(props) {
                     sx={{ borderRadius: 28 }}
                     style={{ width: "150px" }}
                   >
-                    {props.mode == "Register" ? "Register" : "Update"}
+                    {props.mode === "Register" ? "Register" : "Update"}
                   </Button>
                 </Grid>
               </CardContent>
