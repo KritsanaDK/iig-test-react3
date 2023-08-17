@@ -23,8 +23,10 @@ function Form_User(props) {
   const [userInfo] = useLocalStorage("json", []);
   const [open, setOpen] = React.useState(false);
   const [fullWidth, setFullWidth] = React.useState(true);
-  const [maxWidth, setMaxWidth] = React.useState('sm');
-  const [pathName, setPathName] = useState(window.location.pathname.replace('/', ''));
+  const [maxWidth, setMaxWidth] = React.useState("sm");
+  const [pathName, setPathName] = useState(
+    window.location.pathname.replace("/", "")
+  );
   const fileInput = useRef();
 
   const handleClickOpen = () => {
@@ -39,10 +41,10 @@ function Form_User(props) {
     tb_username:
       pathName === "Register"
         ? Yup.string()
-          .required("Username is required")
-          .min(4, "Username must be at least 4 characters")
-          .max(12, "Username must not exceed 12 characters")
-          .matches(/^[a-zA-Z0-9_]*$/, "Invalid password")
+            .required("Username is required")
+            .min(4, "Username must be at least 4 characters")
+            .max(12, "Username must not exceed 12 characters")
+            .matches(/^[a-zA-Z0-9_]*$/, "Invalid password")
         : Yup.string(),
 
     tb_fitstname: Yup.string()
@@ -52,33 +54,33 @@ function Form_User(props) {
     tb_file:
       pathName === "Register"
         ? Yup.mixed()
-          .test("required", "photo is required", (value) => value.length > 0)
-          .test("fileType", "Unsupported File Format", (value) => {
-            return (
-              value.length &&
-              ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
-            );
-          })
-          .test("fileSize", "The file is too large", (value) => {
-            if (!value.length) return true; // attachment is optional
-            return value[0].size <= 1024 * 1024 * 5;
-          })
+            .test("required", "photo is required", (value) => value.length > 0)
+            .test("fileType", "Unsupported File Format", (value) => {
+              return (
+                value.length &&
+                ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
+              );
+            })
+            .test("fileSize", "The file is too large", (value) => {
+              if (!value.length) return true; // attachment is optional
+              return value[0].size <= 1024 * 1024 * 5;
+            })
         : Yup.mixed(),
 
     tb_password:
       pathName === "Register"
         ? Yup.string()
-          .required("Password is required")
-          .min(6, "Password must be at least 6 characters")
-          .test("Find 0-9", "The number is not order 0-9", (val) => {
-            return !"0123456789".includes(val);
-          })
-          .test("Find a-z", "The alphabet is not order a-z", (val) => {
-            return !"abcdefghijklmnopqrstuvwxyz".includes(val);
-          })
-          .test("Find A-Z", "The alphabet is not order A-Z", (val) => {
-            return !"ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(val);
-          })
+            .required("Password is required")
+            .min(6, "Password must be at least 6 characters")
+            .test("Find 0-9", "The number is not order 0-9", (val) => {
+              return !"0123456789".includes(val);
+            })
+            .test("Find a-z", "The alphabet is not order a-z", (val) => {
+              return !"abcdefghijklmnopqrstuvwxyz".includes(val);
+            })
+            .test("Find A-Z", "The alphabet is not order A-Z", (val) => {
+              return !"ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(val);
+            })
         : Yup.string(),
   });
 
@@ -120,7 +122,7 @@ function Form_User(props) {
       axios
         .post("http://localhost:6180/reg_user", k_data, {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            "Content-Type": "multipart/form-data",
           },
         })
         .then((res) => {
@@ -145,7 +147,7 @@ function Form_User(props) {
       axios
         .post("http://localhost:6180/update_user", k_data, {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            "Content-Type": "multipart/form-data",
           },
         })
         .then((res) => {
@@ -154,6 +156,7 @@ function Form_User(props) {
           if (res.data.result === "ok") {
             // setUserInfo(localStorage.getItem("json"));
             handleClickOpen();
+          } else {
           }
 
           // return res.data;
@@ -208,13 +211,12 @@ function Form_User(props) {
         aria-describedby="alert-dialog-description"
         fullWidth={fullWidth}
         maxWidth={maxWidth}
-
       >
         <DialogTitle id="alert-dialog-title">
           <b>{pathName == "Register" ? "Register" : "Update"}</b>
         </DialogTitle>
-        <DialogContent >
-          <DialogContentText id="alert-dialog-description" >
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
             {pathName == "Register"
               ? "Register is completed"
               : "Update  is completed"}
@@ -226,13 +228,16 @@ function Form_User(props) {
       </Dialog>
 
       {pathName !== "Register" && (
-        <Grid container direction="row"
+        <Grid
+          container
+          direction="row"
           justifyContent="right"
           spacing={2}
           style={{
             display: "flex",
             justifyContent: "right",
-          }}>
+          }}
+        >
           <Grid item xs={4} m={2}>
             <Button
               type="button"
@@ -249,8 +254,6 @@ function Form_User(props) {
           </Grid>
         </Grid>
       )}
-
-
 
       <Grid
         container
@@ -279,7 +282,6 @@ function Form_User(props) {
                     <b>
                       {pathName === "Register" ? "REGISTER" : "EDIT PROFILE"}
                     </b>
-
                   </Typography>
                 </Grid>
 
@@ -379,7 +381,6 @@ function Form_User(props) {
                     error={errors.tb_file ? true : false}
                   /> */}
                   <Grid>
-
                     <input
                       ref={fileInput}
                       id="tb_file"
@@ -389,12 +390,8 @@ function Form_User(props) {
                       style={{
                         paddingTop: "20px",
                         paddingBottom: "20px",
-
                       }}
-
                       onChange={previewImage}
-
-
                     />
                   </Grid>
                   <Grid>
@@ -405,14 +402,9 @@ function Form_User(props) {
                       height="200"
                       style={{
                         paddingBottom: "20px",
-
                       }}
                     />
                   </Grid>
-
-
-
-
 
                   <Typography variant="inherit" color="#dd2c00">
                     {errors.tb_file?.message}
@@ -428,20 +420,13 @@ function Form_User(props) {
                     style={{ width: "150px" }}
                   >
                     <b>{pathName === "Register" ? "Register" : "Update"}</b>
-
                   </Button>
-
-
                 </Grid>
-
-
               </CardContent>
             </Box>
           </Card>
         </Grid>
       </Grid>
-
-
     </Container>
   );
 }
