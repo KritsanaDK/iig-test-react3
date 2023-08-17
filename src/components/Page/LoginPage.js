@@ -132,7 +132,7 @@ function LoginPage() {
                     margin="dense"
                     {...register("tb_password")}
                     error={errors.tb_password ? true : false}
-                    // value={"Password12346"}
+                  // value={"Password12346"}
                   />
                   <Typography variant="inherit" color="textSecondary">
                     {errors.tb_password?.message}
@@ -147,7 +147,7 @@ function LoginPage() {
                     sx={{ borderRadius: 28 }}
                     style={{ width: "150px" }}
                   >
-                    Login
+                    <b>Login</b>
                   </Button>
                 </Grid>
 
