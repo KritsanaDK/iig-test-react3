@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -25,6 +25,7 @@ function Form_User(props) {
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('sm');
   const [pathName, setPathName] = useState(window.location.pathname.replace('/', ''));
+  const fileInput = useRef();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -378,7 +379,9 @@ function Form_User(props) {
                     error={errors.tb_file ? true : false}
                   /> */}
                   <Grid>
+
                     <input
+                      ref={fileInput}
                       id="tb_file"
                       type="file"
                       accept=".png, .jpg, .jpeg"
