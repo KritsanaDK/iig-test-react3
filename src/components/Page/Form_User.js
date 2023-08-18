@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
@@ -22,11 +21,14 @@ import CardContent from "@mui/material/CardContent";
 function Form_User(props) {
   const [userInfo] = useLocalStorage("json", []);
   const [open, setOpen] = React.useState(false);
-  const [fullWidth, setFullWidth] = React.useState(true);
-  const [maxWidth, setMaxWidth] = React.useState("sm");
-  const [pathName, setPathName] = useState(
+  const [fullWidth] = React.useState(true);
+  const [maxWidth] = React.useState("sm");
+  const [pathName] = useState(
     window.location.pathname.replace("/", "")
   );
+
+  const [title, setTitle] = React.useState("");
+  const [msg, setMsg] = React.useState("");
   const fileInput = useRef();
 
   const handleClickOpen = () => {
@@ -41,10 +43,10 @@ function Form_User(props) {
     tb_username:
       pathName === "Register"
         ? Yup.string()
-            .required("Username is required")
-            .min(4, "Username must be at least 4 characters")
-            .max(12, "Username must not exceed 12 characters")
-            .matches(/^[a-zA-Z0-9_]*$/, "Invalid password")
+          .required("Username is required")
+          .min(4, "Username must be at least 4 characters")
+          .max(12, "Username must not exceed 12 characters")
+          .matches(/^[a-zA-Z0-9_]*$/, "Invalid password")
         : Yup.string(),
 
     tb_fitstname: Yup.string()
@@ -54,33 +56,33 @@ function Form_User(props) {
     tb_file:
       pathName === "Register"
         ? Yup.mixed()
-            .test("required", "photo is required", (value) => value.length > 0)
-            .test("fileType", "Unsupported File Format", (value) => {
-              return (
-                value.length &&
-                ["image/jpeg", "image/png", "image/jpg"].includes(value[0].type)
-              );
-            })
-            .test("fileSize", "The file is too large", (value) => {
-              if (!value.length) return true; // attachment is optional
-              return value[0].size <= 1024 * 1024 * 5;
-            })
+          .test("required", "Photo is required", (value) => value.length > 0)
+          .test("fileType", "Unsupported File Format", (value) => {
+            return (
+              value.length &&
+              ["image/jpeg", "image/png", "image/jpg", "image/bmp"].includes(value[0].type)
+            );
+          })
+          .test("fileSize", "The file is too large", (value) => {
+            if (!value.length) return true; // attachment is optional
+            return value[0].size <= 1024 * 1024 * 5;
+          })
         : Yup.mixed(),
 
     tb_password:
       pathName === "Register"
         ? Yup.string()
-            .required("Password is required")
-            .min(6, "Password must be at least 6 characters")
-            .test("Find 0-9", "The number is not order 0-9", (val) => {
-              return !"0123456789".includes(val);
-            })
-            .test("Find a-z", "The alphabet is not order a-z", (val) => {
-              return !"abcdefghijklmnopqrstuvwxyz".includes(val);
-            })
-            .test("Find A-Z", "The alphabet is not order A-Z", (val) => {
-              return !"ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(val);
-            })
+          .required("Password is required")
+          .min(6, "Password must be at least 6 characters")
+          .test("Find 0-9", "The number is not order 0-9", (val) => {
+            return !"0123456789".includes(val);
+          })
+          .test("Find a-z", "The alphabet is not order a-z", (val) => {
+            return !"abcdefghijklmnopqrstuvwxyz".includes(val);
+          })
+          .test("Find A-Z", "The alphabet is not order A-Z", (val) => {
+            return !"ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(val);
+          })
         : Yup.string(),
   });
 
@@ -105,8 +107,6 @@ function Form_User(props) {
     let lastname = data.tb_lastname;
     let file = data.tb_file;
 
-    // console.log(file)
-
     const k_data = {
       user: user,
       pass: pass,
@@ -118,7 +118,6 @@ function Form_User(props) {
 
     if (pathName === "Register") {
       console.log("Reg");
-      console.log(k_data);
       axios
         .post("http://localhost:6180/reg_user", k_data, {
           headers: {
@@ -129,7 +128,10 @@ function Form_User(props) {
           console.log(res.data);
 
           if (res.data.result === "ok") {
-            // setUserInfo(localStorage.getItem("json"));
+            setTitle(pathName === "Register" ? "Register" : "Update");
+            setMsg(pathName === "Register"
+              ? "Register is completed"
+              : "Update  is completed")
             handleClickOpen();
 
             reset();
@@ -154,16 +156,19 @@ function Form_User(props) {
           console.log(res.data);
 
           if (res.data.result === "ok") {
-            // setUserInfo(localStorage.getItem("json"));
+            setTitle(pathName === "Register" ? "Register" : "Update");
+            setMsg(pathName === "Register"
+              ? "Register is completed"
+              : "Update  is completed")
             handleClickOpen();
           } else {
+            setTitle("Error Message");
+            setMsg("Password is duplicate from 5 time ago")
+            handleClickOpen();
           }
-
-          // return res.data;
         })
 
         .catch((err) => {
-          console.log(err);
           return err;
         });
     }
@@ -172,27 +177,19 @@ function Form_User(props) {
   const [selectedImage, setSelectedImage] = useState("");
 
   const previewImage = (e) => {
-    const file = e.target.files[0];
-
-    console.log(file);
-
     if (e.target.files && e.target.files.length > 0) {
       setSelectedImage(URL.createObjectURL(e.target.files[0]));
-      // setSelectedImage(e.target.files[0]);
     }
   };
 
   useEffect(() => {
-    console.log("useEffect");
-
     if (pathName === "Register") {
       localStorage.clear();
     }
-
     pathName === "Update"
       ? setSelectedImage("http://127.0.0.1:6180/" + userInfo[0].file_name)
       : setSelectedImage("");
-  }, []);
+  }, [pathName, userInfo]);
 
   return (
     <Container
@@ -213,13 +210,11 @@ function Form_User(props) {
         maxWidth={maxWidth}
       >
         <DialogTitle id="alert-dialog-title">
-          <b>{pathName == "Register" ? "Register" : "Update"}</b>
+          <b>{title}</b>
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {pathName == "Register"
-              ? "Register is completed"
-              : "Update  is completed"}
+            {msg}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -286,7 +281,7 @@ function Form_User(props) {
                 </Grid>
 
                 <Grid style={{ textAlign: "left" }}>
-                  {pathName == "Register" ? (
+                  {pathName === "Register" ? (
                     <div>
                       <TextField
                         required
@@ -385,7 +380,7 @@ function Form_User(props) {
                       ref={fileInput}
                       id="tb_file"
                       type="file"
-                      accept=".png, .jpg, .jpeg"
+                      accept=".png, .jpg, .jpeg, .bmp"
                       {...register("tb_file")}
                       style={{
                         paddingTop: "20px",
